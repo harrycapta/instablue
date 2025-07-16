@@ -1,0 +1,6 @@
+{
+  "username": "tuo_handle.bsky.social",
+  "password": "tua_password",
+  "check_interval": 60,
+  "max_feed_items": 50
+}

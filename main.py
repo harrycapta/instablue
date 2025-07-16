@@ -8,17 +8,18 @@ KEYWORDS = load_keywords()
 LIKED_POSTS = load_liked_posts()
 ACTION_INTERVAL = max(1, 3600 / config.get('actions_per_hour', 30))
 
-client = Client()
+client = Client(base_url=config.get('base_url'))
 client.login(config['username'], config['password'])
 print("✅ Login effettuato")
 
 # --- Ottieni following (amici e amici-di-amici) ---
 def get_all_following_handles(handle):
+    """Return the set of DIDs that the provided handle follows."""
     following = set()
     cursor = None
     while True:
-        res = client.app.bsky.graph.get_following({'actor': handle, 'cursor': cursor})
-        for user in res.following:
+        res = client.app.bsky.graph.get_follows({'actor': handle, 'cursor': cursor})
+        for user in res.follows:
             following.add(user.did)
         if not res.cursor:
             break
@@ -53,11 +54,7 @@ def like_matching_post():
 
         if any(kw in text for kw in KEYWORDS) or author_did in all_allowed_users:
             try:
-                client.app.bsky.feed.send_like(
-                    models.app.bsky.feed.Like(
-                        subject=models.com.atproto.repo.StrongRef(uri=uri, cid=cid)
-                    )
-                )
+                client.like(uri, cid)
                 print(f"❤️ Like a post di {post.author.handle}: {text[:40]}")
                 LIKED_POSTS.add(uri)
                 return True

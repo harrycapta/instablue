@@ -6,6 +6,7 @@ from utils import load_config, load_keywords, load_liked_posts, save_liked_posts
 config = load_config()
 KEYWORDS = load_keywords()
 LIKED_POSTS = load_liked_posts()
+ACTION_INTERVAL = max(1, 3600 / config.get('actions_per_hour', 30))
 
 client = Client()
 client.login(config['username'], config['password'])
@@ -36,7 +37,8 @@ all_allowed_users = my_following | friends_of_friends
 print(f"👨‍👩‍👧‍👦 Rete estesa utenti: {len(all_allowed_users)}")
 
 # --- Like ai post ---
-def like_matching_posts():
+def like_matching_post():
+    """Mette like al primo post che soddisfa i criteri."""
     feed = client.app.bsky.feed.get_timeline(limit=config['max_feed_items'])
 
     for item in feed.feed:
@@ -51,20 +53,25 @@ def like_matching_posts():
 
         if any(kw in text for kw in KEYWORDS) or author_did in all_allowed_users:
             try:
-                client.app.bsky.feed.send_like(models.app.bsky.feed.Like(
-                    subject=models.com.atproto.repo.StrongRef(uri=uri, cid=cid)
-                ))
+                client.app.bsky.feed.send_like(
+                    models.app.bsky.feed.Like(
+                        subject=models.com.atproto.repo.StrongRef(uri=uri, cid=cid)
+                    )
+                )
                 print(f"❤️ Like a post di {post.author.handle}: {text[:40]}")
                 LIKED_POSTS.add(uri)
+                return True
             except Exception as e:
                 print(f"⚠️ Errore like: {e}")
+                return False
+    return False
 
 # --- Loop principale ---
 try:
     while True:
-        like_matching_posts()
+        like_matching_post()
         save_liked_posts(LIKED_POSTS)
-        time.sleep(config['check_interval'])
+        time.sleep(ACTION_INTERVAL)
 except KeyboardInterrupt:
     print("🛑 Uscita manuale, salvando storico like...")
     save_liked_posts(LIKED_POSTS)

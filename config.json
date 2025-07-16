@@ -1,7 +1,7 @@
 {
-  "base_url":"https://mujarrib.com",
-  "username": "mujarrib.com",
-  "password": "ntj2-bngg-o7fa-nsvs",
+  "base_url":"https://blahblah.com",
+  "username": "blah.com",
+  "password": "blah",
   "check_interval": 60,
   "max_feed_items": 50
   , "actions_per_hour": 30

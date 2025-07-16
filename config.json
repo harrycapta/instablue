@@ -3,4 +3,5 @@
   "password": "tua_password",
   "check_interval": 60,
   "max_feed_items": 50
+  , "actions_per_hour": 30
 }

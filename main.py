@@ -8,7 +8,7 @@ KEYWORDS = load_keywords()
 LIKED_POSTS = load_liked_posts()
 ACTION_INTERVAL = max(1, 3600 / config.get('actions_per_hour', 30))
 
-client = Client()
+client = Client(base_url=config.get('base_url'))
 client.login(config['username'], config['password'])
 print("✅ Login effettuato")
 

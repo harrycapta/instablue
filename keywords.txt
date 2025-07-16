@@ -1,4 +1,2 @@
-python
-ai
-#opensource
-bluesky
+#merculedi
+merculedì
